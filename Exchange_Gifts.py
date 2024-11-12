@@ -5,7 +5,7 @@ from docx import Document
 from io import BytesIO
 
 # Establish connection and create table if it doesn't exist
-conn = sqlite3.connect("gift_exchange_uiuc.db")
+conn = sqlite3.connect("gift_xmas.db")
 c = conn.cursor()
 
 # Ensure users table exists
@@ -19,7 +19,7 @@ c.execute('''
 conn.commit()
 
 # Updated participants list
-participants = ["Emily", "Rebecca", "Kelly", "Joanne", "Cecilie", "Sammy", "Cathy", "Woody", "Jensen", "Ali", "Joseph", "Steven", "Alan", "Angelina", "Ericka", "Paul", "Cherry"]
+participants = ["Emily", "Rebecca", "Kelly", "Joanne", "Cecilie", "Sammy", "Cathy", "Woody", "Jensen", "Ali", "Joseph", "Steven", "Alan", "Angelina", "Paul", "Cherry", "Sharon"]
 total_participants = len(participants)  # Total number of participants
 
 # Shuffle participants and assign gifts ensuring no one draws themselves
