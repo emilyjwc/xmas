@@ -61,6 +61,7 @@ def create_pairing_doc():
     doc_io.seek(0)
     return doc_io
 
+
 # Admin view to see all gift assignments and download Word file
 def admin_view():
     st.title("管理員模式 - 查看所有抽籤結果")
@@ -69,6 +70,17 @@ def admin_view():
     if st.button("登入管理員模式"):
         if admin_password == "admin123":
             st.write("管理員登入成功！")
+
+            # Show a list of participants who have completed the draw
+            st.subheader("已完成抽籤的參與者")
+            c.execute("SELECT name, gift FROM users WHERE gift IS NOT NULL")
+            completed_users = c.fetchall()
+
+            if completed_users:
+                for user in completed_users:
+                    st.write(f"{user[0]} 已經抽籤")
+            else:
+                st.write("目前沒有參與者完成抽籤。")
 
             # Check if all participants have completed the draw
             completed_draws = count_completed_draws()
