@@ -5,7 +5,7 @@ from docx import Document
 from io import BytesIO
 
 # Establish connection and create table if it doesn't exist
-conn = sqlite3.connect("gift_exchange_test.db")
+conn = sqlite3.connect("gift_exchange_uiuc.db")
 c = conn.cursor()
 
 # Ensure users table exists
@@ -22,15 +22,7 @@ conn.commit()
 participants = ["Emily", "Rebecca", "Kelly", "Joanne", "Cecilie", "Sammy", "Cathy", "Woody", "Jensen", "Ali", "Joseph", "Steven", "Alan", "Angelina"]
 total_participants = len(participants)  # Total number of participants
 
-# Shuffle participants and assign random numbers to each if not already assigned
-if "numbered_participants" not in st.session_state:
-    shuffled_participants = random.sample(participants, len(participants))
-    st.session_state["numbered_participants"] = {i + 1: shuffled_participants[i] for i in range(total_participants)}
-
-# Access numbered participants from session state
-numbered_participants = st.session_state["numbered_participants"]
-
-# Function to assign gifts and ensure no one draws themselves
+# Shuffle participants and assign gifts ensuring no one draws themselves
 def assign_gifts(participants):
     receivers = participants.copy()
     random.shuffle(receivers)
@@ -51,27 +43,6 @@ def count_completed_draws():
     result = c.fetchone()
     return result[0] if result else 0
 
-# Function to get the number of a participant
-def get_participant_number(name):
-    for number, participant in numbered_participants.items():
-        if participant == name:
-            return number
-    return None
-
-# Function to create a Word document with participant numbers
-def create_participant_doc():
-    document = Document()
-    document.add_heading("交換禮物參與者編號", level=1)
-
-    for number, name in numbered_participants.items():
-        document.add_paragraph(f"{name} - #{number}")
-
-    # Save document to BytesIO for downloading
-    doc_io = BytesIO()
-    document.save(doc_io)
-    doc_io.seek(0)
-    return doc_io
-
 # Function to create a Word document with pairing results
 def create_pairing_doc():
     document = Document()
@@ -82,8 +53,7 @@ def create_pairing_doc():
     for row in results:
         giver = row[0]
         receiver = row[1]
-        receiver_number = get_participant_number(receiver)
-        document.add_paragraph(f"{giver} 抽到的對象是：{receiver}（#{receiver_number}）")
+        document.add_paragraph(f"{giver} 抽到的對象是：{receiver}")
 
     # Save document to BytesIO for downloading
     doc_io = BytesIO()
@@ -99,15 +69,6 @@ def admin_view():
     if st.button("登入管理員模式"):
         if admin_password == "admin123":
             st.write("管理員登入成功！")
-
-            # Download button for participant numbers
-            doc_io_numbers = create_participant_doc()
-            st.download_button(
-                label="下載參與者編號 Word 檔案",
-                data=doc_io_numbers,
-                file_name="participant_numbers.docx",
-                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            )
 
             # Check if all participants have completed the draw
             completed_draws = count_completed_draws()
@@ -185,8 +146,7 @@ elif st.session_state["page"] == "draw":
     if result and result[0]:
         # If the user has already drawn, show only the result and "Return to Main Page" button
         drawn_gift = result[0]
-        gift_number = get_participant_number(drawn_gift)
-        st.write(f"🎉 {name}，你是 {drawn_gift}（#{gift_number}）的聖誕老人 🎉")
+        st.write(f"🎉 {name}，你是 {drawn_gift} 的聖誕老人 🎉")
         if st.button("返回主頁"):
             st.session_state["page"] = "login_or_setup"
     else:
@@ -198,8 +158,7 @@ elif st.session_state["page"] == "draw":
             gift = st.session_state["gift_assignments"][name]
             c.execute("UPDATE users SET gift = ? WHERE name = ?", (gift, name))
             conn.commit()
-            gift_number = get_participant_number(gift)
-            st.write(f"🎉 {name}，你是 {gift}（#{gift_number}）的聖誕老人 🎉")
+            st.write(f"🎉 {name}，你是 {gift} 的聖誕老人 🎉")
             # Change the page to "view" and let Streamlit rerender
             st.session_state["page"] = "view"
             st.session_state["rerun_flag"] = not st.session_state.get("rerun_flag", False)  # Toggle rerun flag
@@ -212,9 +171,8 @@ elif st.session_state["page"] == "view":
     c.execute("SELECT gift FROM users WHERE name = ?", (name,))
     result = c.fetchone()
     if result and result[0]:
-        gift_number = get_participant_number(result[0])
         st.write("🎄🎅🏻🎁🦌✨🎄🎅🏻🎁🦌✨🎄🎅🏻🎁🦌✨🎄🎅🏻🎁🦌✨🎄🎅🏻🎁🦌✨")
-        st.write(f"{name}，你是 {result[0]}（#{gift_number}）的聖誕老人")
+        st.write(f"{name}，你是 {result[0]} 的聖誕老人")
     else:
         st.write("你尚未抽籤。")
 
