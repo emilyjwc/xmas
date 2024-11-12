@@ -5,7 +5,7 @@ from docx import Document
 from io import BytesIO
 
 # Establish connection and create table if it doesn't exist
-conn = sqlite3.connect("gift_xmas_uiuc_2024.db")
+conn = sqlite3.connect("gift_xmas_uiuc.db")
 c = conn.cursor()
 
 # Ensure users table exists
