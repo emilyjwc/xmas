@@ -19,7 +19,7 @@ c.execute('''
 conn.commit()
 
 # Updated participants list
-participants = ["Emily", "Rebecca", "Kelly", "Joanne", "Cecilie", "Sammy", "Cathy", "Woody", "Jensen", "Ali", "Joseph", "Steven", "Alan", "Angelina"]
+participants = ["Emily", "Rebecca", "Kelly", "Joanne", "Cecilie", "Sammy", "Cathy", "Woody", "Jensen", "Ali", "Joseph", "Steven", "Alan", "Angelina", "Ericka", "Paul"]
 total_participants = len(participants)  # Total number of participants
 
 # Shuffle participants and assign gifts ensuring no one draws themselves
